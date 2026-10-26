@@ -14,7 +14,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-
 // Sample pumpkin data (replace with your actual pumpkin data)
 const pumpkins = [
     {
@@ -91,7 +90,7 @@ const pumpkins = [
     }
 ];
 
-// Load votes from Firebase
+// Load votes from Firebase and check localStorage for vote limit
 function loadVotes() {
     const votesRef = database.ref('votes');
     votesRef.on('value', (snapshot) => {
@@ -133,6 +132,9 @@ function renderPumpkins() {
         `;
         pumpkinGallery.appendChild(pumpkinCard);
     });
+
+    // Check if the user has already voted twice
+    checkVotesLeft();
 }
 
 // Function to handle voting
@@ -142,7 +144,48 @@ function vote(id) {
         pumpkin.votes++;
         document.getElementById(`votes-${id}`).textContent = pumpkin.votes;
         saveVotes(); // Save votes to Firebase
+
+        // Update localStorage to track votes
+        let votesLeft = localStorage.getItem("votesLeft");
+        if (votesLeft === null) {
+            votesLeft = 1; // Start with 1 vote left (since we decrement after voting)
+        } else {
+            votesLeft = parseInt(votesLeft) - 1;
+        }
+        localStorage.setItem("votesLeft", votesLeft);
+
+        // Disable the button if the user has voted twice
+        if (votesLeft <= 0) {
+            document.getElementById(`vote-btn-${id}`).disabled = true;
+            document.getElementById(`vote-btn-${id}`).textContent = "You've used your 2 votes!";
+        }
     }
+}
+
+// Function to check if the user has already voted twice
+function checkVotesLeft() {
+    const votesLeft = localStorage.getItem("votesLeft");
+    if (votesLeft === null || votesLeft > 0) {
+        return true; // User can vote
+    } else {
+        // Disable all vote buttons
+        document.querySelectorAll(".vote-btn").forEach(button => {
+            button.disabled = true;
+            button.textContent = "You've used your 2 votes!";
+        });
+        return false; // User cannot vote anymore
+    }
+}
+
+// Function to reset votes (for testing)
+function resetVotes() {
+    localStorage.removeItem("votesLeft");
+    pumpkins.forEach(pumpkin => {
+        pumpkin.votes = 0;
+    });
+    renderPumpkins();
+    saveVotes(); // Save the reset votes to Firebase
+    alert("Your votes have been reset! You can now vote again.");
 }
 
 // Initialize the gallery and load votes
