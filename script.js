@@ -184,12 +184,23 @@ function checkVotesLeft() {
 
 // Function to reset votes (for testing)
 function resetVotes() {
-    localStorage.setItem("votesLeft", "2"); // Reset to 2 votes
+    // Reset the voting limit for this device
+    localStorage.setItem("votesLeft", "2");
+
+    // Remove the votes cast by this device from Firebase
+    const votesRef = database.ref('votes');
     pumpkins.forEach(pumpkin => {
-        pumpkin.votes = 0;
+        if (pumpkin.votes > 0) {
+            pumpkin.votes = 0;
+        }
     });
+
+    // Save the updated votes to Firebase
+    saveVotes();
+
+    // Re-render the pumpkins
     renderPumpkins();
-    saveVotes(); // Save the reset votes to Firebase
+
     alert("Your votes have been reset! You can now vote again.");
 }
 
