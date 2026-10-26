@@ -187,17 +187,6 @@ function resetVotes() {
     // Reset the voting limit for this device
     localStorage.setItem("votesLeft", "2");
 
-    // Remove the votes cast by this device from Firebase
-    const votesRef = database.ref('votes');
-    pumpkins.forEach(pumpkin => {
-        if (pumpkin.votes > 0) {
-            pumpkin.votes = 0;
-        }
-    });
-
-    // Save the updated votes to Firebase
-    saveVotes();
-
     // Re-render the pumpkins
     renderPumpkins();
 
