@@ -1,0 +1,76 @@
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f7f0;
+    color: #333;
+}
+
+header {
+    background-color: #ff6b35;
+    color: white;
+    text-align: center;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5rem;
+}
+
+.pumpkin-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
+    padding: 1rem;
+}
+
+.pumpkin-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s;
+}
+
+.pumpkin-card:hover {
+    transform: scale(1.05);
+}
+
+.pumpkin-card img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    aspect-ratio: 4/3;
+}
+
+.pumpkin-card h3 {
+    margin: 1rem;
+    text-align: center;
+}
+
+.vote-btn {
+    display: block;
+    margin: 1rem auto;
+    padding: 0.5rem 1rem;
+    background-color: #ff6b35;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.vote-btn:hover {
+    background-color: #e55a2b;
+}
+
+footer {
+    text-align: center;
+    padding: 1rem;
+    background-color: #ff6b35;
+    color: white;
+    margin-top: 2rem;
+}

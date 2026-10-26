@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pumpkin Contest 2026</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Bat decorations for the header */
+        .bat-decoration {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('images/bats.png');
+            background-repeat: repeat-x;
+            background-size: contain;
+            opacity: 0.6;
+            z-index: -1;
+        }
+
+        /* Logo in the bottom right */
+        .logo {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            opacity: 0.6;
+            z-index: 1;
+        } 
+
+        /* Header styling */
+        header {
+            position: relative;
+            background-color: #ff6b35;
+            color: white;
+            padding: 20px;
+            border-radius: 0 0 10px 10px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        header p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <!-- Bat background image behind the header text -->
+        <div class="bat-decoration"></div>
+
+        <h1>Speech Solutions Pumpkin Contest 2026</h1>
+        <p>Vote for your favorite pumpkin!</p>
+        <p style="font-size: 0.9rem;"><strong>Limited to two votes per device.</strong></p>
+
+        <!-- Reset Votes Button -->
+        <div style="margin-top: 15px; text-align: right;">
+            <button onclick="resetVotes()" style="
+                padding: 8px 15px;
+                background-color: white;
+                color: #ff6b35;
+                border: 2px solid #ff6b35;
+                border-radius: 5px;
+                cursor: pointer;
+                font-weight: bold;
+            ">
+                Reset your votes
+            </button>
+        </div>
+    </header>
+
+
+   <!-- Bio Section -->
+    <div style="
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 15px;
+        background-color: #f9f7f0;
+        border-left: 4px solid #ff6b35;
+        border-radius: 5px;
+    ">
+       <p style="font-size: 1.1rem; line-height: 1.2; margin-bottom: 0;">
+         &nbsp;&nbsp;  Speech Solutions office staff participated in a pumpkin decoration contest this week. Now, we need your help to decide which pumpkin is the best!
+        </p>
+        <p style="font-size: 1.1rem; line-height: 1.2; margin-bottom: 0;">
+        &nbsp;&nbsp;    Look through the photos of these masterpieces and select the photo of your favorite pumpkin creation! The top three pumpkins with the most votes by noon on October 30th will be declared the winners.
+        </p>
+        <p style="font-size: 1.1rem; line-height: 1.2;">
+         &nbsp;&nbsp;   You can also check the pumpkins out in person, displayed behind the front desk at Speech Solutions Inc of Lumberton at 580 Farringdom St, Lumberton, NC 28358.
+        </p>
+    </div>
+
+    <main>
+        <div class="pumpkin-gallery" id="pumpkinGallery">
+            <!-- Pumpkin images will be added here dynamically -->
+        </div>
+    </main>
+
+    <footer>
+        <p>Happy Halloween! - Speech Solutions Inc.</p>
+    </footer>
+
+    <!-- Transparent logo in the bottom right -->
+    <img src="images/logo.png" alt="Speech Solutions Logo" class="logo">
+
+    <script src="script.js"></script> 
+</body>
+</html>
