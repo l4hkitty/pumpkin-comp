@@ -1,3 +1,20 @@
+// Initialize Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyBPA1_jtwsp-ja56vAYiIOcfLjt7IbuxC8",
+  authDomain: "pumpkin-contest-2026.firebaseapp.com",
+  databaseURL: "https://pumpkin-contest-2026-default-rtdb.firebaseio.com",
+  projectId: "pumpkin-contest-2026",
+  storageBucket: "pumpkin-contest-2026.firebasestorage.app",
+  messagingSenderId: "897706630860",
+  appId: "1:897706630860:web:b8f3fa31ff638c5521ac69",
+  measurementId: "G-BLBXVH4P11"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
+
 // Sample pumpkin data (replace with your actual pumpkin data)
 const pumpkins = [
     {
@@ -74,23 +91,30 @@ const pumpkins = [
     }
 ];
 
-// Load votes from localStorage
+// Load votes from Firebase
 function loadVotes() {
-    const savedVotes = localStorage.getItem("pumpkinVotes");
-    if (savedVotes) {
-        const parsedVotes = JSON.parse(savedVotes);
-        pumpkins.forEach(pumpkin => {
-            const savedPumpkin = parsedVotes.find(p => p.id === pumpkin.id);
-            if (savedPumpkin) {
-                pumpkin.votes = savedPumpkin.votes;
-            }
-        });
-    }
+    const votesRef = database.ref('votes');
+    votesRef.on('value', (snapshot) => {
+        const votesData = snapshot.val();
+        if (votesData) {
+            pumpkins.forEach(pumpkin => {
+                if (votesData[pumpkin.id]) {
+                    pumpkin.votes = votesData[pumpkin.id];
+                }
+            });
+            renderPumpkins();
+        }
+    });
 }
 
-// Save votes to localStorage
+// Save votes to Firebase
 function saveVotes() {
-    localStorage.setItem("pumpkinVotes", JSON.stringify(pumpkins));
+    const votesRef = database.ref('votes');
+    const votesData = {};
+    pumpkins.forEach(pumpkin => {
+        votesData[pumpkin.id] = pumpkin.votes;
+    });
+    votesRef.set(votesData);
 }
 
 // Function to render pumpkin cards
@@ -105,13 +129,10 @@ function renderPumpkins() {
             <img src="${pumpkin.image}" alt="${pumpkin.name}">
             <h3>${pumpkin.name}</h3>
             <p>Votes: <span id="votes-${pumpkin.id}">${pumpkin.votes}</span></p>
-            <button class="vote-btn" onclick="vote(${pumpkin.id})" id="vote-btn-${pumpkin.id}">Vote for this pumpkin</button>
+            <button class="vote-btn" onclick="vote(${pumpkin.id})" id="vote-btn-${pumpkin.id}">Vote for me!</button>
         `;
         pumpkinGallery.appendChild(pumpkinCard);
     });
-
-    // Disable vote buttons if the user has already voted 2 times
-    checkVotesLeft();
 }
 
 // Function to handle voting
@@ -120,55 +141,8 @@ function vote(id) {
     if (pumpkin) {
         pumpkin.votes++;
         document.getElementById(`votes-${id}`).textContent = pumpkin.votes;
-        saveVotes(); // Save votes to localStorage
-        updateVotesLeft();
+        saveVotes(); // Save votes to Firebase
     }
-}
-
-// Function to check if the user has already voted 2 times
-function checkVotesLeft() {
-    const votesLeft = localStorage.getItem("votesLeft");
-    if (votesLeft === null || votesLeft > 0) {
-        return true; // User can vote
-    } else {
-        // Disable all vote buttons
-        document.querySelectorAll(".vote-btn").forEach(button => {
-            button.disabled = true;
-            button.textContent = "You've used your 2 votes!";
-        });
-        return false; // User cannot vote anymore
-    }
-}
-
-// Function to update the number of votes left
-function updateVotesLeft() {
-    let votesLeft = localStorage.getItem("votesLeft");
-    if (votesLeft === null) {
-        votesLeft = 1; // Start with 1 vote left (since we decrement after voting)
-    } else {
-        votesLeft = parseInt(votesLeft) - 1;
-    }
-
-    localStorage.setItem("votesLeft", votesLeft);
-
-    // If no votes left, disable all buttons
-    if (votesLeft <= 0) {
-        document.querySelectorAll(".vote-btn").forEach(button => {
-            button.disabled = true;
-            button.textContent = "You've used your 2 votes!";
-        });
-    }
-}
-
-// Function to reset votes
-function resetVotes() {
-    localStorage.removeItem("pumpkinVotes");
-    localStorage.removeItem("votesLeft");
-    pumpkins.forEach(pumpkin => {
-        pumpkin.votes = 0;
-    });
-    renderPumpkins();
-    alert("Your votes have been reset. You can now vote again!");
 }
 
 // Initialize the gallery and load votes
