@@ -159,8 +159,13 @@ function submitVotes() {
     const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
     const selectedPumpkins = Array.from(checkedBoxes).map(checkbox => parseInt(checkbox.value));
 
-    if (selectedPumpkins.length !== 2) {
-        alert("Please select exactly two pumpkins!");
+    if (selectedPumpkins.length === 0) {
+        alert("Please select at least one pumpkin!");
+        return;
+    }
+
+    if (selectedPumpkins.length > 2) {
+        alert("You can only vote for a maximum of two pumpkins!");
         return;
     }
 
@@ -188,9 +193,6 @@ function submitVotes() {
     confirmationMessage.style.fontWeight = "bold";
     confirmationMessage.textContent = "Thank you for voting! Votes have been submitted.";
     document.getElementById("pumpkinGallery").appendChild(confirmationMessage);
-
-    // Log the votes to the console for debugging
-    console.log("Votes submitted:", selectedPumpkins);
 }
 
 // Initialize the gallery and load votes
