@@ -90,7 +90,7 @@ const pumpkins = [
     }
 ];
 
-// Load votes from Firebase and check localStorage for vote limit
+// Load votes from Firebase
 function loadVotes() {
     const votesRef = database.ref('votes');
     votesRef.on('value', (snapshot) => {
@@ -116,7 +116,7 @@ function saveVotes() {
     votesRef.set(votesData);
 }
 
-// Function to render pumpkin cards
+// Function to render pumpkin cards with checkboxes
 function renderPumpkins() {
     const pumpkinGallery = document.getElementById("pumpkinGallery");
     pumpkinGallery.innerHTML = "";
@@ -128,69 +128,69 @@ function renderPumpkins() {
             <img src="${pumpkin.image}" alt="${pumpkin.name}">
             <h3>${pumpkin.name}</h3>
             <p>Votes: <span id="votes-${pumpkin.id}">${pumpkin.votes}</span></p>
-            <button class="vote-btn" onclick="vote(${pumpkin.id})" id="vote-btn-${pumpkin.id}">Vote for me!</button>
+            <input type="checkbox" id="checkbox-${pumpkin.id}" value="${pumpkin.id}">
+            <label for="checkbox-${pumpkin.id}">Vote for this pumpkin</label>
         `;
         pumpkinGallery.appendChild(pumpkinCard);
     });
 
-    // Check if the user has already voted twice
-    checkVotesLeft();
+    // Add submit button
+    const submitButton = document.createElement("div");
+    submitButton.style.margin = "20px auto";
+    submitButton.style.textAlign = "center";
+    submitButton.innerHTML = `
+        <button onclick="submitVotes()" style="
+            padding: 10px 20px;
+            background-color: #ff6b35;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        ">
+            Submit Votes
+        </button>
+    `;
+    pumpkinGallery.appendChild(submitButton);
 }
 
-// Function to handle voting
-function vote(id) {
-    const votesLeft = localStorage.getItem("votesLeft");
-    if (votesLeft === null || parseInt(votesLeft) > 0) {
+// Function to handle vote submission
+function submitVotes() {
+    const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
+    const selectedPumpkins = Array.from(checkedBoxes).map(checkbox => parseInt(checkbox.value));
+
+    if (selectedPumpkins.length !== 2) {
+        alert("Please select exactly two pumpkins!");
+        return;
+    }
+
+    // Update votes in Firebase
+    selectedPumpkins.forEach(id => {
         const pumpkin = pumpkins.find(p => p.id === id);
         if (pumpkin) {
             pumpkin.votes++;
-            document.getElementById(`votes-${id}`).textContent = pumpkin.votes;
-            saveVotes(); // Save votes to Firebase
-
-            // Update localStorage to track votes
-            let votesLeft = localStorage.getItem("votesLeft");
-            if (votesLeft === null) {
-                votesLeft = 2; // Start with 2 votes
-            } else {
-                votesLeft = parseInt(votesLeft) - 1;
-            }
-            localStorage.setItem("votesLeft", votesLeft);
-
-            // Disable the button if the user has voted twice
-            if (votesLeft <= 0) {
-                document.getElementById(`vote-btn-${id}`).disabled = true;
-                document.getElementById(`vote-btn-${id}`).textContent = "You've used your 2 votes!";
-            }
         }
-    } else {
-        alert("You've already used your 2 votes!");
-    }
-}
+    });
 
-// Function to check if the user has already voted twice
-function checkVotesLeft() {
-    const votesLeft = localStorage.getItem("votesLeft");
-    if (votesLeft === null || parseInt(votesLeft) > 0) {
-        return true; // User can vote
-    } else {
-        // Disable all vote buttons
-        document.querySelectorAll(".vote-btn").forEach(button => {
-            button.disabled = true;
-            button.textContent = "You've used your 2 votes!";
-        });
-        return false; // User cannot vote anymore
-    }
-}
+    saveVotes();
 
-// Function to reset votes (for testing)
-function resetVotes() {
-    // Reset the voting limit for this device
-    localStorage.setItem("votesLeft", "2");
+    // Hide checkboxes and submit button
+    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.style.display = "none";
+    });
+    document.querySelector('button[onclick="submitVotes()"]').style.display = "none";
 
-    // Re-render the pumpkins
-    renderPumpkins();
+    // Show confirmation message
+    const confirmationMessage = document.createElement("div");
+    confirmationMessage.style.textAlign = "center";
+    confirmationMessage.style.margin = "20px";
+    confirmationMessage.style.fontSize = "1.2rem";
+    confirmationMessage.style.fontWeight = "bold";
+    confirmationMessage.textContent = "Thank you for voting! Votes have been submitted.";
+    document.getElementById("pumpkinGallery").appendChild(confirmationMessage);
 
-    alert("Your votes have been reset! You can now vote again.");
+    // Log the votes to the console for debugging
+    console.log("Votes submitted:", selectedPumpkins);
 }
 
 // Initialize the gallery and load votes
