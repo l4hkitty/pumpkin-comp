@@ -90,6 +90,23 @@ const pumpkins = [
     }
 ];
 
+// Check if the user has already voted on this device
+function hasUserVoted() {
+    return localStorage.getItem('hasVoted') === 'true';
+}
+
+// Mark the user as having voted on this device
+function markUserAsVoted() {
+    localStorage.setItem('hasVoted', 'true');
+}
+
+// Reset the voting status for this device (for testing)
+function resetVotesForDevice() {
+    localStorage.removeItem('hasVoted');
+    renderPumpkins();
+    alert("Your votes have been reset for this device!");
+}
+
 // Load votes from Firebase
 function loadVotes() {
     const votesRef = database.ref('votes');
@@ -120,6 +137,19 @@ function saveVotes() {
 function renderPumpkins() {
     const pumpkinGallery = document.getElementById("pumpkinGallery");
     pumpkinGallery.innerHTML = "";
+
+    // Check if the user has already voted on this device
+    const userHasVoted = hasUserVoted();
+
+    if (userHasVoted) {
+        // Show a message if the user has already voted
+        pumpkinGallery.innerHTML = `
+            <div style="text-align: center; margin: 20px; font-size: 1.2rem; font-weight: bold;">
+                You have already voted on this device. Thank you!
+            </div>
+        `;
+        return;
+    }
 
     pumpkins.forEach(pumpkin => {
         const pumpkinCard = document.createElement("div");
@@ -198,6 +228,7 @@ function submitVotes() {
     });
 
     saveVotes();
+    markUserAsVoted(); // Mark the user as having voted on this device
 
     // Hide checkboxes and submit button
     document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
