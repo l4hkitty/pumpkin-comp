@@ -141,6 +141,7 @@ function renderPumpkins() {
     // Check if the user has already voted on this device
     const userHasVoted = hasUserVoted();
 
+    // Render pumpkins and their vote counts
     pumpkins.forEach(pumpkin => {
         const pumpkinCard = document.createElement("div");
         pumpkinCard.className = "pumpkin-card";
@@ -150,12 +151,13 @@ function renderPumpkins() {
             <p>Votes: <span id="votes-${pumpkin.id}">${pumpkin.votes}</span></p>
         `;
 
-        // If the user has already voted, disable the checkboxes and submit button
+        // If the user has already voted, show a message but still display the pumpkins
         if (userHasVoted) {
             pumpkinCard.innerHTML += `
                 <p style="color: #ff6b35; font-weight: bold;">You have already voted on this device.</p>
             `;
         } else {
+            // Add checkboxes and labels only if the user hasn't voted yet
             pumpkinCard.innerHTML += `
                 <input type="checkbox" id="checkbox-${pumpkin.id}" value="${pumpkin.id}" onchange="handleCheckboxChange()">
                 <label for="checkbox-${pumpkin.id}">Vote for this pumpkin</label>
@@ -207,34 +209,4 @@ function handleCheckboxChange() {
     }
 }
 
-// Function to handle vote submission
-function submitVotes() {
-    const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
-    const selectedPumpkins = Array.from(checkedBoxes).map(checkbox => parseInt(checkbox.value));
-
-    if (selectedPumpkins.length === 0) {
-        alert("Please select at least one pumpkin!");
-        return;
-    }
-
-    if (selectedPumpkins.length > 2) {
-        alert("You can only vote for a maximum of two pumpkins!");
-        return;
-    }
-
-    // Update votes in Firebase
-    selectedPumpkins.forEach(id => {
-        const pumpkin = pumpkins.find(p => p.id === id);
-        if (pumpkin) {
-            pumpkin.votes++;
-        }
-    });
-
-    saveVotes();
-    markUserAsVoted(); // Mark the user as having voted on this device
-
-    // Re-render the pumpkins to show the updated state
-    renderPumpkins();
-}
-
-// Initialize the gallery and load votes
+// Function to handle
