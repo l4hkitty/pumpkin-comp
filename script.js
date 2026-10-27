@@ -128,7 +128,7 @@ function renderPumpkins() {
             <img src="${pumpkin.image}" alt="${pumpkin.name}">
             <h3>${pumpkin.name}</h3>
             <p>Votes: <span id="votes-${pumpkin.id}">${pumpkin.votes}</span></p>
-            <input type="checkbox" id="checkbox-${pumpkin.id}" value="${pumpkin.id}">
+            <input type="checkbox" id="checkbox-${pumpkin.id}" value="${pumpkin.id}" onchange="handleCheckboxChange()">
             <label for="checkbox-${pumpkin.id}">Vote for this pumpkin</label>
         `;
         pumpkinGallery.appendChild(pumpkinCard);
@@ -152,6 +152,26 @@ function renderPumpkins() {
         </button>
     `;
     pumpkinGallery.appendChild(submitButton);
+}
+
+// Function to handle checkbox changes
+function handleCheckboxChange() {
+    const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+
+    if (checkedBoxes.length >= 2) {
+        checkboxes.forEach(checkbox => {
+            if (!checkbox.checked) {
+                checkbox.disabled = true;
+                checkbox.style.opacity = "0.5";
+            }
+        });
+    } else {
+        checkboxes.forEach(checkbox => {
+            checkbox.disabled = false;
+            checkbox.style.opacity = "1";
+        });
+    }
 }
 
 // Function to handle vote submission
