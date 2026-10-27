@@ -141,16 +141,6 @@ function renderPumpkins() {
     // Check if the user has already voted on this device
     const userHasVoted = hasUserVoted();
 
-    if (userHasVoted) {
-        // Show a message if the user has already voted
-        pumpkinGallery.innerHTML = `
-            <div style="text-align: center; margin: 20px; font-size: 1.2rem; font-weight: bold;">
-                You have already voted on this device. Thank you!
-            </div>
-        `;
-        return;
-    }
-
     pumpkins.forEach(pumpkin => {
         const pumpkinCard = document.createElement("div");
         pumpkinCard.className = "pumpkin-card";
@@ -158,30 +148,43 @@ function renderPumpkins() {
             <img src="${pumpkin.image}" alt="${pumpkin.name}">
             <h3>${pumpkin.name}</h3>
             <p>Votes: <span id="votes-${pumpkin.id}">${pumpkin.votes}</span></p>
-            <input type="checkbox" id="checkbox-${pumpkin.id}" value="${pumpkin.id}" onchange="handleCheckboxChange()">
-            <label for="checkbox-${pumpkin.id}">Vote for this pumpkin</label>
         `;
+
+        // If the user has already voted, disable the checkboxes and submit button
+        if (userHasVoted) {
+            pumpkinCard.innerHTML += `
+                <p style="color: #ff6b35; font-weight: bold;">You have already voted on this device.</p>
+            `;
+        } else {
+            pumpkinCard.innerHTML += `
+                <input type="checkbox" id="checkbox-${pumpkin.id}" value="${pumpkin.id}" onchange="handleCheckboxChange()">
+                <label for="checkbox-${pumpkin.id}">Vote for this pumpkin</label>
+            `;
+        }
+
         pumpkinGallery.appendChild(pumpkinCard);
     });
 
-    // Add submit button
-    const submitButton = document.createElement("div");
-    submitButton.style.margin = "20px auto";
-    submitButton.style.textAlign = "center";
-    submitButton.innerHTML = `
-        <button onclick="submitVotes()" style="
-            padding: 10px 20px;
-            background-color: #ff6b35;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        ">
-            Submit Votes
-        </button>
-    `;
-    pumpkinGallery.appendChild(submitButton);
+    // Add submit button only if the user hasn't voted yet
+    if (!userHasVoted) {
+        const submitButton = document.createElement("div");
+        submitButton.style.margin = "20px auto";
+        submitButton.style.textAlign = "center";
+        submitButton.innerHTML = `
+            <button onclick="submitVotes()" style="
+                padding: 10px 20px;
+                background-color: #ff6b35;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-weight: bold;
+            ">
+                Submit Votes
+            </button>
+        `;
+        pumpkinGallery.appendChild(submitButton);
+    }
 }
 
 // Function to handle checkbox changes
@@ -230,22 +233,8 @@ function submitVotes() {
     saveVotes();
     markUserAsVoted(); // Mark the user as having voted on this device
 
-    // Hide checkboxes and submit button
-    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-        checkbox.style.display = "none";
-    });
-    document.querySelector('button[onclick="submitVotes()"]').style.display = "none";
-
-    // Show confirmation message
-    const confirmationMessage = document.createElement("div");
-    confirmationMessage.style.textAlign = "center";
-    confirmationMessage.style.margin = "20px";
-    confirmationMessage.style.fontSize = "1.2rem";
-    confirmationMessage.style.fontWeight = "bold";
-    confirmationMessage.textContent = "Thank you for voting! Votes have been submitted.";
-    document.getElementById("pumpkinGallery").appendChild(confirmationMessage);
+    // Re-render the pumpkins to show the updated state
+    renderPumpkins();
 }
 
 // Initialize the gallery and load votes
-loadVotes();
-renderPumpkins();
